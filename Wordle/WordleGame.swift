@@ -20,9 +20,9 @@ class WordleGame: ObservableObject {
         mysteryWord = "WORDS"
     }
     
-    func guess(word: String) {
-        guard word.count == WordleGame.wordLength else { return }
-        currentGuess = word.uppercased()
+    func guess() {
+        guard currentGuess.count == WordleGame.wordLength else { return }
+        currentGuess = currentGuess.uppercased()
         
         evaluateGuess()
         
@@ -35,17 +35,37 @@ class WordleGame: ObservableObject {
     
     private func evaluateGuess() {
         var guess = Guess(word: currentGuess)
+        var usedIndexes = Set<Int>()
         
         for index in 0..<WordleGame.wordLength {
             if mysteryWord[index] == guess.word[index] {
                 guess.squares[index] = .right
-            } else if mysteryWord.contains(guess.word[index]) {
-                guess.squares[index] = .wrongLocation
-            } else {
+                usedIndexes.update(with: index)
+            }
+        }
+        
+        for index in 0..<WordleGame.wordLength {
+            if guess.squares[index] == .preGuess {
+                if mysteryWord.contains(guess.word[index]) {
+                    for characterIndex in 0..<mysteryWord.count {
+                        if mysteryWord[characterIndex] == guess.word[index] {
+                            if !usedIndexes.contains(characterIndex) {
+                                guess.squares[index] = .wrongLocation
+                                usedIndexes.update(with: characterIndex)
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+        
+        for index in 0..<WordleGame.wordLength {
+            if guess.squares[index] == .preGuess {
                 guess.squares[index] = .notUsed
             }
         }
-          
+        
         guesses[activeRowIndex] = guess
     }
     

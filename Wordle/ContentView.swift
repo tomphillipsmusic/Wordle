@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var guess = ""
+    //@State private var guess = ""
     @StateObject var game = WordleGame()
     
     var body: some View {
@@ -22,12 +22,10 @@ struct ContentView: View {
                 WordleRow(guess: $game.guesses[index])
             }
 
-            TextField("Input", text: $guess)
+            TextField("Input", text: $game.currentGuess)
             
-            Button("Guess") {
-                game.guess(word: guess)
-            }
-            .disabled(guess.count != WordleGame.wordLength)
+            Button("Guess", action: game.guess)
+                .disabled(game.currentGuess.count != WordleGame.wordLength)
             Spacer()
         }        
     }
