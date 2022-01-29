@@ -19,4 +19,8 @@ extension Color {
     public static var correct: Color {
         return Color("Correct", bundle: nil)
     }
+    
+    public static var border: Color {
+        return Color("Border", bundle: nil)
+    }
 }
