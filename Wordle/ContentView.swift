@@ -31,6 +31,9 @@ struct ContentView: View {
         .alert("Not in Word List", isPresented: $game.isGuessInvalid) {
             Button("OK", role: .cancel, action: {})
         }
+        .alert("Game Over", isPresented: $game.isGameOver) {
+            Button("OK", role: .none, action: {})
+        }
     }
     
 }
