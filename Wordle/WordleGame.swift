@@ -18,10 +18,19 @@ class WordleGame: ObservableObject {
     @Published var isGuessInvalid = false
     let library: WordleLibrary
     
+    static let daysSinceStart: Int? =  {
+        var dateComponents = DateComponents()
+        dateComponents.month = 6
+        dateComponents.day = 19
+        dateComponents.year = 2021
+        let firstDay = Calendar.current.date(from: dateComponents)
+        return Calendar.current.dateComponents([.day], from: firstDay!, to: .now).day
+    }()
+    
     init(library: WordleLibrary) {
         self.library = library
         WordleGame.wordLength = library.wordLength
-        mysteryWord = library.possibleMysteryWords.randomElement()?.uppercased() ?? "Error"
+        mysteryWord = library.possibleMysteryWords[WordleGame.daysSinceStart!]
     }
     
     func guess() {
