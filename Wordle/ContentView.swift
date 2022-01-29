@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
-    //@State private var guess = ""
-    @StateObject var game = WordleGame()
+    @StateObject var game = WordleGame(library: Library())
     
     var body: some View {
         VStack {
+            Text(game.mysteryWord)
             Text("WORLDLE")
                 .font(.largeTitle)
             Divider()
@@ -27,8 +27,12 @@ struct ContentView: View {
             Button("Guess", action: game.guess)
                 .disabled(game.currentGuess.count != WordleGame.wordLength)
             Spacer()
-        }        
+        }
+        .alert("Not in Word List", isPresented: $game.isGuessInvalid) {
+            Button("OK", role: .cancel, action: {})
+        }
     }
+    
 }
 
 struct ContentView_Previews: PreviewProvider {

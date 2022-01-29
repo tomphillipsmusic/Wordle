@@ -9,21 +9,32 @@ import Foundation
 import SwiftUI
 
 class WordleGame: ObservableObject {
-    static let wordLength = 5
+    static var wordLength = 5
     static let numberOfGuesses = 6
     @Published var mysteryWord: String
     @Published var guesses = [Guess](repeating: Guess(), count: numberOfGuesses)
     @Published var currentGuess = ""
     @Published var activeRowIndex = 0
+    @Published var isGuessInvalid = false
+    let library: WordleLibrary
     
-    init() {
-        mysteryWord = "WORDS"
+    init(library: WordleLibrary) {
+        self.library = library
+        WordleGame.wordLength = library.wordLength
+        mysteryWord = library.possibleMysteryWords.randomElement()?.uppercased() ?? "Error"
     }
     
     func guess() {
         guard currentGuess.count == WordleGame.wordLength else { return }
-        currentGuess = currentGuess.uppercased()
         
+        guard library.possibleMysteryWords.contains(currentGuess.lowercased()),
+              library.validGuesses.contains(currentGuess.lowercased()) else {
+            isGuessInvalid = true
+            return
+        }
+        
+        currentGuess = currentGuess.uppercased()
+
         evaluateGuess()
         
         if currentGuess == mysteryWord || activeRowIndex + 1 == WordleGame.numberOfGuesses {
@@ -55,15 +66,12 @@ class WordleGame: ObservableObject {
                             }
                         }
                     }
+                } else {
+                    guess.squares[index] = .notUsed
+
                 }
             }
 
-        }
-        
-        for index in 0..<WordleGame.wordLength {
-            if guess.squares[index] == .preGuess {
-                guess.squares[index] = .notUsed
-            }
         }
         
         guesses[activeRowIndex] = guess
