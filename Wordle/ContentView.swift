@@ -8,14 +8,28 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var text = ""
+    
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        VStack {
+            Text("WORLDLE")
+                .font(.largeTitle)
+            Divider()
+                .padding(.bottom, 20)
+            
+            ForEach(0..<5) { _ in
+                WordleRow()
+            }
+
+            TextField("Input", text: $text)
+            Spacer()
+        }        
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .preferredColorScheme(.dark)
     }
 }
