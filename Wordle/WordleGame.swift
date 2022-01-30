@@ -13,50 +13,46 @@ class WordleGame: ObservableObject {
     static let numberOfGuesses = 6
     @Published var mysteryWord: String
     @Published var guesses = [Guess](repeating: Guess(), count: numberOfGuesses)
-    @Published var currentGuess = ""
+    @Published var currentGuess: TextLimiter
     @Published var activeRowIndex = 0
     @Published var isGuessInvalid = false
     @Published var isGameOver = false
     let library: WordleLibrary
     
-    static let daysSinceStart: Int? =  {
-        var dateComponents = DateComponents()
-        dateComponents.month = 6
-        dateComponents.day = 19
-        dateComponents.year = 2021
-        let firstDay = Calendar.current.date(from: dateComponents)
-        return Calendar.current.dateComponents([.day], from: firstDay!, to: .now).day
-    }()
-    
     init(library: WordleLibrary) {
         self.library = library
         WordleGame.wordLength = library.wordLength
-        mysteryWord = library.possibleMysteryWords[WordleGame.daysSinceStart!].uppercased()
+        mysteryWord = library.selectMysteryWord()
+        currentGuess = TextLimiter(limit: library.wordLength)
     }
     
     func guess() {
-        guard currentGuess.count == WordleGame.wordLength else { return }
+        guard currentGuess.value.count == WordleGame.wordLength else {
+            isGuessInvalid = true
+            return
+            
+        }
         
-        guard library.possibleMysteryWords.contains(currentGuess.lowercased()) ||
-              library.validGuesses.contains(currentGuess.lowercased()) else {
+        guard library.possibleMysteryWords.contains(currentGuess.value.lowercased()) ||
+              library.validGuesses.contains(currentGuess.value.lowercased()) else {
             isGuessInvalid = true
             return
         }
         
         evaluateGuess()
         
-        if currentGuess.uppercased() == mysteryWord || activeRowIndex + 1 == WordleGame.numberOfGuesses {
+        if currentGuess.value.uppercased() == mysteryWord || activeRowIndex + 1 == WordleGame.numberOfGuesses {
             isGameOver = true
             activeRowIndex = 0
         } else {
             activeRowIndex += 1
         }
         
-        currentGuess = ""
+        currentGuess.value = ""
     }
     
     private func evaluateGuess() {
-        var guess = Guess(word: currentGuess.uppercased())
+        var guess = Guess(word: currentGuess.value.uppercased())
         var usedIndexes = Set<Int>()
         
         for index in 0..<WordleGame.wordLength {

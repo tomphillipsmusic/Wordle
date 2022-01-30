@@ -12,7 +12,9 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            Text(game.mysteryWord)
+            
+            // Current answer for debugging purposes
+            // Text(game.mysteryWord)
             Text("WORLDLE")
                 .font(.largeTitle)
             Divider()
@@ -22,10 +24,14 @@ struct ContentView: View {
                 WordleRow(guess: $game.guesses[index])
             }
 
-            TextField("Input", text: $game.currentGuess)
+            TextField("Input", text: $game.currentGuess.value)
+                .border(Color.red,
+                        width: $game.currentGuess.hasReachedLimit.wrappedValue ? 1 : 0 )
+                .padding()
             
             Button("Guess", action: game.guess)
-                .disabled(game.currentGuess.count != WordleGame.wordLength)
+                .padding()
+                .disabled(game.currentGuess.value.count != WordleGame.wordLength)
             Spacer()
         }
         .alert("Not in Word List", isPresented: $game.isGuessInvalid) {
