@@ -17,16 +17,20 @@ struct ContentView: View {
             // Text(game.mysteryWord)
             Text("WORLDLE")
                 .font(.largeTitle)
+                .accessibilityHint("Welcome to Wordle, everyone's FAVORITE new word puzzle game! You have \(WordleGame.numberOfGuesses) guesses to guess the \(game.mysteryWord.count) letter mystery word")
             Divider()
                 .padding(.bottom, 20)
             
             ForEach(0..<WordleGame.numberOfGuesses) { index in
                 WordleRow(guess: $game.guesses[index])
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Row \(index + 1).  \(game.guesses[index].guessSummary)")
             }
 
             TextField("Input", text: $game.currentGuess.value)
                 .border(Color.red,
                         width: $game.currentGuess.hasReachedLimit.wrappedValue ? 1 : 0 )
+                .accessibilityHint("Type your guess for row \(game.activeRowIndex + 1). You have \(WordleGame.numberOfGuesses - game.activeRowIndex) guesses left")
                 .padding()
             
             Button("Guess", action: game.guess)

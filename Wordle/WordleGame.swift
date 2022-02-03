@@ -26,6 +26,12 @@ class WordleGame: ObservableObject {
         currentGuess = TextLimiter(limit: library.wordLength)
     }
     
+    private func announceGuessSummary() {
+        if UIAccessibility.isVoiceOverRunning {
+            UIAccessibility.post(notification: .screenChanged, argument: "Row \(activeRowIndex + 1).  \(guesses[activeRowIndex].guessSummary).")
+        }
+    }
+    
     func guess() {
         guard currentGuess.value.count == WordleGame.wordLength else {
             isGuessInvalid = true
@@ -40,6 +46,7 @@ class WordleGame: ObservableObject {
         }
         
         evaluateGuess()
+        announceGuessSummary()
         
         if currentGuess.value.uppercased() == mysteryWord || activeRowIndex + 1 == WordleGame.numberOfGuesses {
             isGameOver = true
@@ -119,10 +126,41 @@ class WordleGame: ObservableObject {
                 return .border
             }
         }
+        
+        var description: String {
+            switch self {
+            case .right:
+                return "Correct. "
+            case .notUsed:
+                return "Not used. "
+            case .preGuess:
+                return ""
+            case .wrongLocation:
+                return "Wrong location."
+            }
+        }
     }
 }
 
 struct Guess {
     var word = ""
     var squares = [WordleGame.SquareState](repeating: .preGuess, count: WordleGame.wordLength)
+    
+    var guessSummary: String {
+        
+        var summary = ""
+        
+        if word.isEmpty {
+            summary.append("No guess yet.")
+        } else {
+            summary.append("You guessed \(word). ")
+        }
+        
+        for (index, letter) in word.enumerated() {
+            let squareStatus = squares[index].description
+            summary.append("\(letter), \(squareStatus)")
+        }
+        
+        return summary
+    }
 }
